@@ -1,0 +1,20 @@
+version: '3'
+services:
+  electron-devcontainer:
+    # https://code.visualstudio.com/docs/devcontainers/create-dev-container
+    container_name: electron-devcontainer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DISPLAY=unix$DISPLAY
+    volumes:
+      - ../..:/workspaces:cached
+      # make sure electron access X11 on host computer
+      # run first in host computer
+      # 'xhost +local:docker'
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /var/run/docker.sock:/var/run/docker-host.sock
+    network_mode: host
+    command: /bin/bash -c "while sleep 1000; do :; done"
+    
