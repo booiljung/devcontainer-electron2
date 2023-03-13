@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:0-18
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 RUN apt-get update -y --no-install-recommends \
     && apt-get install -y --no-install-recommends \
@@ -14,7 +15,9 @@ RUN apt-get update -y --no-install-recommends \
     apt-utils \
     dialog \
     git \
-    xauth
+    xauth \
+    x-window-system \
+    mesa-utils
 
 RUN apt-get update -y --no-install-recommends \
     && apt-get install -y --no-install-recommends \
@@ -28,10 +31,8 @@ RUN apt-get update -y --no-install-recommends \
     libxss1 libasound2 \
     libdrm-dev \
     libgl1-mesa-glx \
-    x11-apps \
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libcanberra-gtk-module libcanberra-gtk3-module \
+    x11-apps
 
 RUN apt-get update && apt-get install -yq --no-install-suggests --no-install-recommends \
     xinit \
@@ -42,7 +43,12 @@ RUN apt-get update && apt-get install -yq --no-install-suggests --no-install-rec
     x11-xserver-utils \
     fonts-liberation \
     fonts-roboto \
-    fonts-symbola \
+    fonts-symbola
+
+RUN apt-get autoremove -y \
+    && apt-get clean -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN /etc/init.d/dbus start
 
 USER $USERNAME
